@@ -122,8 +122,8 @@ class TcpServer(Node):
         if function is None:
             self.send_unity_error("Don't understand SysCommand.'{}'".format(topic))
         else:
-            # message_json = data.decode("utf-8")[:-1]
-            message_json = data.decode("utf-8")
+            # Strip null bytes e pega só o primeiro objeto JSON válido
+            message_json = data.decode("utf-8").rstrip('\x00').strip()
             print(f"[DEBUG] Received raw message: {message_json}")
             params = json.loads(message_json)
             function(**params)
