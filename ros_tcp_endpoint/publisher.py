@@ -20,7 +20,6 @@ from rclpy.serialization import deserialize_message
 from .communication import RosSender
 from ros_tcp_endpoint.ros_msg_converter import convert_data
 
-
 class RosPublisher(RosSender):
     """
     Class to publish messages to a ROS topic
@@ -43,29 +42,12 @@ class RosPublisher(RosSender):
         self.pub = self.create_publisher(message_class, topic, queue_size)
 
     def send(self, data):
-        """
-        Takes in serialized message data from source outside of the ROS network,
-        deserializes it into it's message class, and publishes the message to ROS topic.
-
-        Args:
-            data: The already serialized message_class data coming from outside of ROS
-
-        Returns:
-            None: Explicitly return None so behaviour can be
-        """
-        # message_type = type(self.msg)
-        # message = deserialize_message(data, message_type)
-
         try:
-            msg = convert_data(self.topic, data)  
-            if msg:
-                print(f"[DEBUG] Publishing parsed message to {self.topic}")
-                self.pub.publish(msg)
-            else:
-                print(f"[WARNING] Could not convert data for topic {self.topic}")
+            message_type = type(self.msg)
+            msg = deserialize_message(data, message_type)
+            self.pub.publish(msg)
         except Exception as e:
             print(f"[ERROR] Failed to process message for topic {self.topic}: {e}")
-
         return None
 
     def unregister(self):
